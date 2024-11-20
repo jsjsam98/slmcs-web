@@ -1,4 +1,4 @@
-# docker-compose.yml
+version: "3"
 
 services:
     react-app:
@@ -7,15 +7,21 @@ services:
         container_name: react_app
         ports:
             - "3000:3000"
+        networks:
+            - react-network
 
     nginx:
         image: nginx:latest
         container_name: nginx_proxy
         ports:
-            - "80:80"
-            - "443:443"
+            - "80:80" # Expose HTTP traffic only
         volumes:
-            - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-            - /etc/nginx/ssl:/etc/nginx/ssl:ro # Mount SSL certificates
+            - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro # Mount NGINX config file
         depends_on:
             - react-app
+        networks:
+            - react-network
+
+networks:
+    react-network:
+        driver: bridge
